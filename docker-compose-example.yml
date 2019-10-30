@@ -1,0 +1,33 @@
+version: '3.4'
+x-default: &default
+  restart: always
+  env_file:
+    - config.env
+
+services:
+  python:
+    <<: *default
+    build: .
+    depends_on:
+      - db
+    networks:
+      - internal
+      - db
+
+  db:
+    <<: *default
+    image: postgres:11-alpine
+    volumes:
+      - type: volume
+        source: db-Triviabot
+        target: /var/lib/postgresql/data
+    networks:
+      - db
+
+
+volumes:
+  db-Triviabot:
+
+networks:
+  internal:
+  db:
