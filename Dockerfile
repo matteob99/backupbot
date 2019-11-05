@@ -1,12 +1,15 @@
-FROM python:3.7-slim
+FROM python:3.7-alpine as base
+FROM base as builder
+COPY requirements.txt /requirements.txt
+RUN pip install --install-option="--prefix=/install" -r /requirements.txt
+
+FROM base
+COPY --from=builder /install /usr/local
 RUN mkdir /code
 WORKDIR /code
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-RUN apt-get update && apt-get -y install cron postgresql-client
-COPY requirements.txt /code/requirements.txt
 RUN touch /code/env.sh; chmod 0667 /code/env.sh
-RUN pip install --no-cache-dir -r requirements.txt
 COPY backup-cron /etc/cron.d/backup-cron
 RUN chmod 0644 /etc/cron.d/backup-cron
 RUN crontab /etc/cron.d/backup-cron
