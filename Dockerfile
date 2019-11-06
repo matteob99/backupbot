@@ -9,7 +9,6 @@ RUN mkdir /code
 WORKDIR /code
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-RUN touch /code/env.sh; chmod 0667 /code/env.sh
 COPY backup-cron /etc/cron.d/backup-cron
 RUN chmod 0644 /etc/cron.d/backup-cron
 RUN crontab /etc/cron.d/backup-cron
