@@ -5,6 +5,7 @@ RUN pip install --install-option="--prefix=/install" -r /requirements.txt
 
 FROM base
 COPY --from=builder /install /usr/local
+RUN apk add  postgresql-client
 RUN mkdir /code
 WORKDIR /code
 ENV PYTHONDONTWRITEBYTECODE 1
