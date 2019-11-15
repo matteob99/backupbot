@@ -7,7 +7,7 @@ bot = botogram.create(getenv("TOKEN_TG"))
 date = dt.now().strftime("%Y_%m_%d_%H_%M")
 file = 'backup_{custom}_{date}.gz'.format(custom=getenv("NAME"),
                                           date=date)
-program = ("/usr/bin/mysqldump --user={user} "+
+program = ("/usr/bin/mysqldump --user={user} " +
            "--password={pwd} -h {host} {database}").format(
     user=getenv("MYSQL_USER"),
     pwd=getenv("MYSQL_PASSWORD"),
