@@ -7,27 +7,32 @@ x-default: &default
 services:
   python:
     <<: *default
-    build: .
+    build:
+      dockerfile: Dockerfile
+      context: .
+      args:
+        database: mariadb
     depends_on:
       - db
-    networks:
-      - internal
-      - db
+
 
   db:
     <<: *default
-    image: postgres:11-alpine
+    image: mariadb
     volumes:
       - type: volume
         source: db-Triviabot
-        target: /var/lib/postgresql/data
-    networks:
+        target: /var/lib/mysql
+
+  adminer:
+    image: adminer
+    restart: always
+    depends_on:
       - db
+    ports:
+      - 8081:8080
 
 
 volumes:
   db-Triviabot:
 
-networks:
-  internal:
-  db:

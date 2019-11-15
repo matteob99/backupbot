@@ -26,26 +26,9 @@ build_image_master:
   stage: deploy
   script:
     - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin $CI_REGISTRY_1
-    - docker build --pull -t "$CI_REGISTRY_IMAGE" .
-    - docker push "$CI_REGISTRY_IMAGE"
+    - bash ./gitlab.sh
   only:
     - master
-  variables:
-    DOCKER_HOST: tcp://docker:2375
-    CI_REGISTRY_1: https://docker.tcorporate.ml
-
-
-build_image_beta:
-  services:
-    - docker:dind
-  image: docker:latest
-  stage: deploy
-  script:
-    - echo "$REGISTRY_PASSWORD" | docker login -u "$REGISTRY_USER" --password-stdin $CI_REGISTRY_1
-    - docker build --pull -t "$CI_REGISTRY_IMAGE:beta" .
-    - docker push "$CI_REGISTRY_IMAGE:beta"
-  only:
-    - beta
   variables:
     DOCKER_HOST: tcp://docker:2375
     CI_REGISTRY_1: https://docker.tcorporate.ml
