@@ -31,4 +31,4 @@ build_image_master:
     - master
   variables:
     DOCKER_HOST: tcp://docker:2375
-    CI_REGISTRY_1: https://docker.tcorporate.ml
+    CI_REGISTRY_1: https://registry.gitlab.com
