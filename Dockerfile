@@ -13,7 +13,7 @@ ENV PYTHONUNBUFFERED 1
 RUN apk add zip
 COPY dockerfile.sh /dockerfile.sh
 RUN chmod 777 /dockerfile.sh
-RUN /dockerfile.sh
+RUN sh /dockerfile.sh
 RUN rm /dockerfile.sh
 RUN mkdir /code
 WORKDIR /code
