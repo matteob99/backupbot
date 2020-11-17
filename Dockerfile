@@ -12,7 +12,9 @@ ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 RUN apk add zip
 COPY dockerfile.sh /dockerfile.sh
+RUN chmod 777 /dockerfile.sh
 RUN /dockerfile.sh
+RUN rm /dockerfile.sh
 RUN mkdir /code
 WORKDIR /code
 COPY backup-cron /etc/cron.d/backup-cron
