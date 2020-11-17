@@ -11,7 +11,7 @@ ENV DATABASENAME $database
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 RUN apk add zip
-COPY dockerfille.sh ./dockerfile.sh
+COPY dockerfile.sh ./dockerfile.sh
 RUN dockerfile.sh
 RUN mkdir /code
 WORKDIR /code
