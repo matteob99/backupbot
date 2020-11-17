@@ -11,8 +11,8 @@ ENV DATABASENAME $database
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 RUN apk add zip
-COPY dockerfile.sh ./dockerfile.sh
-RUN dockerfile.sh
+COPY dockerfile.sh /dockerfile.sh
+RUN /dockerfile.sh
 RUN mkdir /code
 WORKDIR /code
 COPY backup-cron /etc/cron.d/backup-cron
