@@ -1,5 +1,6 @@
 import gzip
 from sh import pg_dump
+from os.path import getmtime
 from glob import glob
 from subprocess import Popen, PIPE
 from os import getenv, remove
@@ -30,7 +31,8 @@ p = Popen(split, shell=True, stdout=PIPE)
 p.wait()
 
 chat = bot.chat(getenv("CHAT_BACKUP"))
-for i, file in enumerate(glob(f"{file_name}.z*")):
+for i, file in enumerate(sorted(glob(f"{file_name}.z*"),
+                                key=getmtime)):
 
     text = "#{custom}\n#d{date}\n{file}\nn:{list}".format(
         custom=getenv("NAME"),

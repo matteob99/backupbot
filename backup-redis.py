@@ -2,6 +2,7 @@ import redis
 import json
 from time import time
 from botogram.api import TelegramAPI
+from os.path import getmtime
 from botogram import Bot
 import os
 from os import getenv
@@ -105,7 +106,9 @@ def main():
     path = cryptoandcompresspath(path1)
     os.remove(path1)
     try:
-        for i, file in enumerate(glob(f"{'.'.join(path.split('.')[:-1])}.*")):
+        for i, file in enumerate(sorted(
+                glob(f"{'.'.join(path.split('.')[:-1])}.*"),
+                key=getmtime)):
             chat.send_file(file, notify=False, caption=text.format(
                 path=path[2:-9],
                 time=time() - t,
