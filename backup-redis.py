@@ -73,9 +73,7 @@ def restoredb(host="localhost", port=6379, password=None, db=0,
         for b in jsondb["value"][a]:
             #    print(a, b, jsondb["value"][a][b])
             r.hset(a, b, str(jsondb["value"][a][b]))
-            #print(r.hget(a, b))
-        #    break
-        # break
+
     return True
 
 
@@ -113,12 +111,13 @@ def main():
                 time=time() - t,
                 listdb=listdb,
                 list=i))
-    except Exception as e:
+    except Exception:
         print_exc()
         chat.send("o cazzo")
     os.remove(path)
     for file in glob(f"{'.'.join(path.split('.')[:-1])}.*"):
         os.remove(file)
+
 
 if __name__ == "__main__":
     main()

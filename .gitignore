@@ -99,7 +99,7 @@ ipython_config.py
 #   install all needed dependencies.
 #Pipfile.lock
 
-# celery beat schedule file
+# celery beat schedule file_name
 celerybeat-schedule
 
 # SageMath parsed files
