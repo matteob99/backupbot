@@ -27,7 +27,7 @@ p = Popen(program, shell=True, stdout=PIPE)
 p.wait()
 split = (f"/usr/bin/zip -r -s {getenv('MAX_SIZE_BACKUP')} " +
          f"{file_name}.zip {file_name} --password {getenv('BACKUP_PASSWORD')}")
-p = Popen(split, shell=True, stdout=PIPE)
+p = Popen(split, shell=True)
 p.wait()
 chat = bot.chat(getenv("CHAT_BACKUP"))
 for i, file in enumerate(sorted(glob(f"{file_name}.z*"),

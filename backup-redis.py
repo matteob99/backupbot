@@ -83,7 +83,7 @@ def cryptoandcompresspath(path, pathdest=None):
         pathdest = path+'.zip'
     split = (f"/usr/bin/zip -r -s {getenv('MAX_SIZE_BACKUP')} " +
              f"{pathdest} {path} --password {getenv('BACKUP_PASSWORD')}")
-    p = Popen(split, shell=True, stdout=PIPE)
+    p = Popen(split, shell=True)
     p.wait()
     return pathdest
 

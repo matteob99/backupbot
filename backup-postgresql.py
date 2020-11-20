@@ -27,7 +27,7 @@ text = "#{custom}\n#d{date}\n{file}".format(custom=getenv("NAME"),
 
 split = (f"/usr/bin/zip -r -s {getenv('MAX_SIZE_BACKUP')} " +
          f"{file_name}.zip {file_name} --password {getenv('BACKUP_PASSWORD')}")
-p = Popen(split, shell=True, stdout=PIPE)
+p = Popen(split, shell=True)
 p.wait()
 
 chat = bot.chat(getenv("CHAT_BACKUP"))
