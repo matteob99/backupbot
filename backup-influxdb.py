@@ -6,6 +6,7 @@ from botogram import Bot
 from subprocess import Popen, PIPE
 from os.path import getmtime
 from glob import glob
+from time import sleep
 bot = Bot(TelegramAPI(api_key=getenv("TG_TOKEN_BACKUP"),
                       endpoint=getenv("TG_ENDPOINT", None)))
 
@@ -39,6 +40,7 @@ for i, file in enumerate(sorted(glob(f"{file_name}.z*"),
         list=i
         )
     chat.send_file(path=file, caption=text)
+    sleep(0.13)
 remove(file_name)
 for file in glob(f"{file_name}.z*"):
     remove(file)

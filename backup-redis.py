@@ -1,6 +1,6 @@
 import redis
 import json
-from time import time
+from time import time, sleep
 from botogram.api import TelegramAPI
 from os.path import getmtime
 from botogram import Bot
@@ -114,6 +114,7 @@ def main():
                 time=time() - t,
                 listdb=listdb,
                 list=i))
+            sleep(0.13)
     except Exception:
         print_exc()
         chat.send("o cazzo")
