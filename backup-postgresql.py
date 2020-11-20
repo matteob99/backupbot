@@ -2,7 +2,7 @@ import gzip
 from sh import pg_dump
 from os.path import getmtime
 from glob import glob
-from subprocess import Popen, PIPE
+from subprocess import Popen
 from os import getenv, remove
 from datetime import datetime as dt
 from botogram.api import TelegramAPI

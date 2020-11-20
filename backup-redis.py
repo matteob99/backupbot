@@ -7,7 +7,7 @@ from botogram import Bot
 import os
 from os import getenv
 from traceback import print_exc
-from subprocess import Popen, PIPE
+from subprocess import Popen
 from glob import glob
 
 

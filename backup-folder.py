@@ -3,7 +3,7 @@ from os.path import getmtime
 from datetime import datetime as dt
 from botogram.api import TelegramAPI
 from botogram import Bot
-from subprocess import Popen, PIPE
+from subprocess import Popen
 from glob import glob
 bot = Bot(TelegramAPI(api_key=getenv("TG_TOKEN_BACKUP"),
                       endpoint=getenv("TG_ENDPOINT", None)))
