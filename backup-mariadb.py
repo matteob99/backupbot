@@ -7,6 +7,7 @@ from subprocess import Popen, PIPE
 from os.path import getmtime
 from glob import glob
 from time import sleep
+from traceback import print_exc
 bot = Bot(TelegramAPI(api_key=getenv("TG_TOKEN_BACKUP"),
                       endpoint=getenv("TG_ENDPOINT", None)))
 
@@ -22,23 +23,26 @@ program = ("/usr/bin/mysqldump --user={user} " +
     pwd=getenv("MYSQL_PASSWORD"),
     host=getenv("MYSQL_HOST"),
     database=database)
-p = Popen(program, shell=True, stdout=PIPE)
-with gzip.open(file_name, "wb") as f:
-    f.writelines(p.stdout)
-split = (f"/usr/bin/zip -r -s {getenv('MAX_SIZE_BACKUP')} " +
-         f"{file_name}.zip {file_name} --password {getenv('BACKUP_PASSWORD')}")
-p = Popen(split, shell=True)
-p.wait()
-chat = bot.chat(getenv("CHAT_BACKUP"))
-for i, file in enumerate(sorted(glob(f"{file_name}.z*"), key=getmtime)):
-    text = "#{custom}\n#d{date}\n{file}\nn:{list}".format(
-        custom=getenv("NAME"),
-        date=date,
-        file=file_name,
-        list=i
-        )
-    chat.send_file(path=file, caption=text)
-    sleep(0.13)
+try:
+    p = Popen(program, shell=True, stdout=PIPE)
+    with gzip.open(file_name, "wb") as f:
+        f.writelines(p.stdout)
+    split = (f"/usr/bin/zip -r -s {getenv('MAX_SIZE_BACKUP')} " +
+             f"{file_name}.zip {file_name} --password {getenv('BACKUP_PASSWORD')}")
+    p = Popen(split, shell=True)
+    p.wait()
+    chat = bot.chat(getenv("CHAT_BACKUP"))
+    for i, file in enumerate(sorted(glob(f"{file_name}.z*"), key=getmtime)):
+        text = "#{custom}\n#d{date}\n{file}\nn:{list}".format(
+            custom=getenv("NAME"),
+            date=date,
+            file=file_name,
+            list=i
+            )
+        chat.send_file(path=file, caption=text)
+        sleep(0.13)
+except Exception:
+    print_exc()
 remove(file_name)
 for file in glob(f"{file_name}.z*"):
     remove(file)
