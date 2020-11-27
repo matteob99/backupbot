@@ -30,7 +30,8 @@ try:
                                                 file=file_name)
 
     split = (f"/usr/bin/zip -r -s {getenv('MAX_SIZE_BACKUP')} " +
-             f"{file_name}.zip {file_name} --password {getenv('BACKUP_PASSWORD')}")
+             f"{file_name}.zip {file_name} --password" +
+             f" {getenv('BACKUP_PASSWORD')}")
     p = Popen(split, shell=True)
     p.wait()
 

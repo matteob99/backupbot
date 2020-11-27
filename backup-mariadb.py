@@ -28,7 +28,8 @@ try:
     with gzip.open(file_name, "wb") as f:
         f.writelines(p.stdout)
     split = (f"/usr/bin/zip -r -s {getenv('MAX_SIZE_BACKUP')} " +
-             f"{file_name}.zip {file_name} --password {getenv('BACKUP_PASSWORD')}")
+             f"{file_name}.zip {file_name} " +
+             f"--password {getenv('BACKUP_PASSWORD')}")
     p = Popen(split, shell=True)
     p.wait()
     chat = bot.chat(getenv("CHAT_BACKUP"))
