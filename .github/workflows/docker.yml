@@ -73,6 +73,7 @@ jobs:
         with:
           name: github_env
           path: github.env
+          if-no-files-found: warn
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
