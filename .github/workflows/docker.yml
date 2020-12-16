@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    name: Build Docker image (${{ matrix.arch }})
+    name: Build Docker image (${{matrix.database}}) (${{ matrix.arch }})
     runs-on: ubuntu-latest
     env:
       IMAGE_TAG: ghcr.io/${{ github.repository_owner }}/backupbot
