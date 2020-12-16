@@ -50,13 +50,13 @@ jobs:
           echo "HASH_VERSION=$HASH_VERSION" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "SAFE_ARCH=$SAFE_ARCH" >> $GITHUB_ENV
-          echo "DATABASE=$SAFE_DATABASE" >> $GITHUB_ENV
+          echo "DATABASE=$DATABASE" >> $GITHUB_ENV
 
           # Print debug info
           echo "hash version: $HASH_VERSION"
           echo "version: $VERSION"
           echo "safe arch: $SAFE_ARCH"
-          echo "DATABASE: $SAFE_DATABASE"
+          echo "DATABASE: $DATABASE"
           echo "test secrets ${{ secrets.actions }}  "
           echo "test secrets ${{ secrets.actions.TEST }}  "
           echo "test secrets ${{ secrets.TEST }}  "
