@@ -55,7 +55,9 @@ jobs:
           echo "hash version: $HASH_VERSION"
           echo "version: $VERSION"
           echo "safe arch: $SAFE_ARCH"
-
+          echo "${{ secrets.GH_USERNAME }} : ${{ secrets.GH_ACCESS_TOKEN }}"
+          echo "${{ secrets }}"
+          echo "${{ secrets.GH_USERNAME }} : ${{ secrets.GH_ACCESS_TOKEN }}"
           # Save env to file
           cat $GITHUB_ENV > github.env
 
