@@ -42,7 +42,6 @@ jobs:
           HASH_VERSION=$(echo "$HASH_VERSION" | awk '{print tolower($0)}')
           VERSION=$(echo "$VERSION" | awk '{print tolower($0)}')
           ARCH=${{ matrix.arch }}
-          DATABASE=${{ matrix.database }}
           SAFE_ARCH=${ARCH///}  # linux/amd64 -> linuxamd64
 
           # Store variable for future use
@@ -52,19 +51,11 @@ jobs:
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "SAFE_ARCH=$SAFE_ARCH" >> $GITHUB_ENV
           echo "DATABASE=$DATABASE" >> $GITHUB_ENV
-          echo "GH_USERNAME=${{ secrets.GH_USERNAME}}" >> $GITHUB_ENV
 
           # Print debug info
           echo "hash version: $HASH_VERSION"
           echo "version: $VERSION"
           echo "safe arch: $SAFE_ARCH"
-          echo "DATABASE: $DATABASE"
-          echo "test secrets ${{ secrets.actions }}  "
-          echo "test secrets ${{ secrets.actions.TEST }}  "
-          echo "test secrets ${{ secrets.TEST }}  "
-          echo "${{ secrets.GH_USERNAME }} : ${{ secrets.GH_ACCESS_TOKEN }}"
-          echo "${{ secrets }}"
-          echo "${{ secrets.DOCKERHUB_USERNAME }} : ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}"
           # Save env to file
           cat $GITHUB_ENV > github.env
 
