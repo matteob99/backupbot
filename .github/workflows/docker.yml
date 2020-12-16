@@ -55,6 +55,7 @@ jobs:
           echo "hash version: $HASH_VERSION"
           echo "version: $VERSION"
           echo "safe arch: $SAFE_ARCH"
+          echo "test secrets ${{ secrets.test }}  "
           echo "${{ secrets.GH_USERNAME }} : ${{ secrets.GH_ACCESS_TOKEN }}"
           echo "${{ secrets }}"
           echo "${{ secrets.GH_USERNAME }} : ${{ secrets.GH_ACCESS_TOKEN }}"
@@ -77,9 +78,9 @@ jobs:
         uses: actions/cache@v2
         with:
           path: /tmp/.buildx-cache
-          key: ${{ runner.os }}-buildx-${{ env.SAFE_ARCH }}-${{ github.sha }}
+          key: ${{ runner.os }}-${{ matrix.database}}-buildx-${{ env.SAFE_ARCH }}-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-buildx-${{ env.SAFE_ARCH }}-
+            ${{ runner.os }}-${{ matrix.database}}-buildx-${{ env.SAFE_ARCH }}-
       - name: Login to ghcr registry
         uses: docker/login-action@v1
         if: ${{ github.event_name != 'pull_request' }}
@@ -131,7 +132,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: image_${{ env.SAFE_ARCH }}
-          path: ${{ env.SAFE_ARCH }}.tar
+          path: ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
 
   push-manifest:
     name: Create and push multi-arch Docker manifest
