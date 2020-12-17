@@ -19,7 +19,7 @@ jobs:
 
     steps:
       - name: Checkout current repo
-        if: ${{ !(matrix.database == 'influxdb' && matrix.arch == "linux/386")}}
+        if: ${{ !(matrix.database == 'influxdb' && matrix.arch == 'linux/386')}}
         uses: actions/checkout@v2
         with:
           submodules: "recursive"
