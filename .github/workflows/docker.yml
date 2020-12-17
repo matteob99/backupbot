@@ -128,7 +128,7 @@ jobs:
       - name: Save image as tar archive
         if: ${{ github.event_name != 'pull_request' && !(matrix.database == 'influxdb' && matrix.arch == 'linux/386')}}
         run: |
-          docker save ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
+          docker save ${{ env.IMAGE_TAG }}:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
       - name: Save image as tar archive (pull request)
         if: ${{ github.event_name == 'pull_request' && !(matrix.database == 'influxdb' && matrix.arch == 'linux/386')}}
         run: |
