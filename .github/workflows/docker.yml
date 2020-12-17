@@ -135,6 +135,7 @@ jobs:
           docker save backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
       - name: Upload image as artifact
         uses: actions/upload-artifact@v2
+        if: ${{ !(matrix.database == 'influxdb' && (matrix.arch == 'linux/386' || matrix.arch =='linux/arm/v6'))}}
         with:
           name: image_${{ matrix.database}}_${{ env.SAFE_ARCH }}
           path: ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
