@@ -136,7 +136,7 @@ jobs:
       - name: Upload image as artifact
         uses: actions/upload-artifact@v2
         with:
-          name: image_${{ env.SAFE_ARCH }}
+          name: image_${{ matrix.database}}_${{ env.SAFE_ARCH }}
           path: ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
 
   push-manifest:
