@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     name: Build Docker image (${{matrix.database}}) (${{ matrix.arch }})
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     env:
       IMAGE_TAG: ghcr.io/${{ github.repository_owner }}/backupbot
       IMAGE_TAG_DH: ${{ secrets.DOCKERHUB_OWNER }}/backupbot
@@ -142,7 +142,7 @@ jobs:
 
   push-manifest:
     name: Create and push multi-arch Docker manifest
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     if: ${{ github.event_name != 'pull_request' && false }}
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
@@ -175,6 +175,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
       - name: Create and push manifest
+
         run: |
           # -- Push to ghcr.io
           docker manifest create ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }} \
