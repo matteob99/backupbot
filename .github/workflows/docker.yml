@@ -185,7 +185,6 @@ jobs:
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
       - name: Create and push manifest
-        if: ${{ false }}
 
         run: |
           if [ "${{ matrix.database }}" != influxdb ]; then
