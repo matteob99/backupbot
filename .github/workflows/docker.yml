@@ -197,7 +197,7 @@ jobs:
           for arch in "${archs[@]}"; do
              manifest="$manifest --amend ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch"
           done
-          docker manifest create ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }} "$manifest"
+          docker manifest create ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }} $manifest
           docker manifest push ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}
 
           # Tag images as VERSION (like 'latest')
@@ -208,10 +208,10 @@ jobs:
           for arch in "${archs[@]}"; do
              manifest="$manifest --amend ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.VERSION }}-$arch"
           done
-          docker manifest create ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.VERSION }} "$manifest"
+          docker manifest create ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.VERSION }} $manifest
           docker manifest push ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.VERSION }}
 
-          # -- PUsh to Docker Hub
+          # -- Push to Docker Hub
           for arch in "${archs[@]}"; do
             docker tag "${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch" "${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.VERSION }}-$arch"
           done
@@ -219,7 +219,7 @@ jobs:
           for arch in "${archs[@]}"; do
              manifest="$manifest --amend ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch"
           done
-          docker manifest create ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.HASH_VERSION }} "$manifest"
+          docker manifest create ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.HASH_VERSION }} $manifest
           docker manifest push ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.HASH_VERSION }}
           # Tag images as VERSION (like 'latest')
           for arch in "${archs[@]}"; do
@@ -229,5 +229,5 @@ jobs:
           for arch in "${archs[@]}"; do
              manifest="$manifest --amend ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.VERSION }}-$arch"
           done
-          docker manifest create ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.VERSION }} "$manifest"
+          docker manifest create ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.VERSION }} $manifest
           docker manifest push ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.VERSION }}
