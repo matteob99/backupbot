@@ -163,7 +163,7 @@ jobs:
       - name: Load environment info and built images
         run: |
           cat github_env/github.env > $GITHUB_ENV
-          if [ "${{ matrix.database }}" != influxdb]; then
+          if [ "${{ matrix.database }}" != influxdb ]; then
             docker load --input image_${{ matrix.database }}_linux386/${{ matrix.database }}-linux386.tar
             docker load --input image_${{ matrix.database }}_linuxarmv6/${{ matrix.database }}-linuxarmv6.tar
           fi
