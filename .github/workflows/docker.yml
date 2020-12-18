@@ -188,57 +188,47 @@ jobs:
         if: ${{ false }}
 
         run: |
+          if [ "${{ matrix.database }}" != influxdb ]; then
+            declare -a archs=("linux386" "linuxamd64" "linuxarmv6" "linuxarmv7" "linuxarm64" "linuxppc64le")
+          else
+            declare -a archs=("linuxamd64" "linuxarmv7" "linuxarm64" "linuxppc64le")
+          fi
           # -- Push to ghcr.io
-          docker manifest create ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }} \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linux386 \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxamd64 \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarmv6 \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarmv7 \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarm64 \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxppc64le
-          docker manifest push ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}
+          manifest=""
+          for arch in "${archs[@]}"; do
+             manifest="$manifest --amend ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch"
+          done
+          docker manifest create ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }} "$manifest"
+          docker manifest push ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}
+
           # Tag images as VERSION (like 'latest')
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linux386 ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linux386
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxamd64 ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxamd64
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarmv6 ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarmv6
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarmv7 ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarmv7
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarm64 ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarm64
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxppc64le ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxppc64le
-          docker manifest create ${{ env.IMAGE_TAG }}:${{ env.VERSION }} \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linux386 \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxamd64 \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarmv6 \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarmv7 \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxarm64 \
-          --amend ${{ env.IMAGE_TAG }}:${{ env.VERSION }}-linuxppc64le
-          docker manifest push ${{ env.IMAGE_TAG }}:${{ env.VERSION }}
-          # -- Push to Docker Hub
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linux386 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linux386
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxamd64 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxamd64
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarmv6 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxarmv6
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarmv7 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxarmv7
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarm64 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxarm64
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxppc64le ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxppc64le
-          docker manifest create ${{ env.IMAGE_TAG_DH }}:${{ env.HASH_VERSION }} \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.HASH_VERSION }}-linux386 \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.HASH_VERSION }}-linuxamd64 \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.HASH_VERSION }}-linuxarmv6 \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.HASH_VERSION }}-linuxarmv7 \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.HASH_VERSION }}-linuxarm64 \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.HASH_VERSION }}-linuxppc64le
-          docker manifest push ${{ env.IMAGE_TAG_DH }}:${{ env.HASH_VERSION }}
+          for arch in "${archs[@]}"; do
+            docker tag "${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch" "${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.VERSION }}-$arch"
+          done
+          manifest=""
+          for arch in "${archs[@]}"; do
+             manifest="$manifest --amend ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.VERSION }}-$arch"
+          done
+          docker manifest create ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.VERSION }} "$manifest"
+          docker manifest push ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.VERSION }}
+
+          # -- PUsh to Docker Hub
+          for arch in "${archs[@]}"; do
+            docker tag "${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch" "${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.VERSION }}-$arch"
+          done
+          manifest=""
+          for arch in "${archs[@]}"; do
+             manifest="$manifest --amend ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch"
+          done
+          docker manifest create ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.HASH_VERSION }} "$manifest"
+          docker manifest push ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.HASH_VERSION }}
           # Tag images as VERSION (like 'latest')
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linux386 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linux386
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxamd64 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxamd64
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarmv6 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxarmv6
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarmv7 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxarmv7
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxarm64 ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxarm64
-          docker tag ${{ env.IMAGE_TAG }}:${{ env.HASH_VERSION }}-linuxppc64le ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxppc64le
-          docker manifest create ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }} \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linux386 \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxamd64 \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxarmv6 \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxarmv7 \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxarm64 \
-          --amend ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}-linuxppc64le
-          docker manifest push ${{ env.IMAGE_TAG_DH }}:${{ env.VERSION }}
+          for arch in "${archs[@]}"; do
+            docker tag "${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch" "${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.VERSION }}-$arch"
+          done
+          manifest=""
+          for arch in "${archs[@]}"; do
+             manifest="$manifest --amend ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.VERSION }}-$arch"
+          done
+          docker manifest create ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.VERSION }} "$manifest"
+          docker manifest push ${{ env.IMAGE_TAG_DH }}:${{ matrix.database }}-${{ env.VERSION }}
