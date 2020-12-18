@@ -16,11 +16,11 @@ jobs:
       matrix:
         arch: [linux/386, linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/ppc64le]
         database: [folder, influxdb, redis, mariadb, postgresql]
-      exclude:
-        - arch: linux/386
-          database: influxdb
-        - arch: linux/arm/v6
-          database: influxdb
+        exclude:
+          - arch: linux/386
+            database: influxdb
+          - arch: linux/arm/v6
+            database: influxdb
 
     steps:
       - name: Checkout current repo
