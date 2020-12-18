@@ -96,7 +96,7 @@ def main():
     chat = bot.chat(getenv("CHAT_BACKUP"))
     redisdball = []
     listdb = ""
-    redisdball = alldb(host=getenv("REDIS_USER"),
+    redisdball = alldb(host=getenv("REDIS_HOST"),
                        port=int(getenv("REDIS_PORT")),
                        password=getenv("REDIS_PASSWORD"),
                        name=getenv("NAME"),
