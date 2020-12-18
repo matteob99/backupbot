@@ -1,8 +1,9 @@
 # backupbot
 
 ##ita 🇮🇹
+backupbot e' un insieme di imagini docker per creare backup schedulati di diversi database
 
-###backup supportati:
+backup supportati:
 - [influxdb](ghcr.io/matteob99/backupbot:influxdb-latest)
 - [mariadb](ghcr.io/matteob99/backupbot:mariadb-latest)
 - [postgresql](ghcr.io/matteob99/backupbot:postgresql-latest)
