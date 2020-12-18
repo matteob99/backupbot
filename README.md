@@ -11,7 +11,7 @@ backup supportati:
 - [redis](ghcr.io/matteob99/backupbot:redis-latest)
 - [folder](ghcr.io/matteob99/backupbot:folder-latest)
 
-###env comuni:
+### env comuni:
 - TG_TOKEN_BACKUP: token del bot
 - TG_ENDPOINT: endpoint delle bot api di default https://api.telegram.org/
 - NAME: nome del backup
@@ -20,23 +20,23 @@ backup supportati:
 - CHAT_BACKUP: chat dove mandare i file
 - CRONTAB_CUSTOM: di default e' ogni giorno a mezzanotte se si vuole cambiare seguire la doc di [crontab](https://man7.org/linux/man-pages/man5/crontab.5.html)
 
-###env influxdb:
+### env influxdb:
 - INFLUXDB_HOST: indirizzo del server influxdb
 - INFLUXDB_PORT: porta del server influxdb
 
-###env mariadb
+### env mariadb
 - MYSQL_USER: utente di mariadb
 - MYSQL_PASSWORD: password dell'utente mariadb
 - MYSQL_HOST: indirizzo del server mariadb
 - MYSQL_DB: database backup se non indicato o è ``all`` sono tutti quanti i database
 
-###env postgresql
+### env postgresql
 - POSTGRES_USER: utente di postgresql
 - POSTGRES_PASSWORD: password dell'utente postgresql
 - POSTGRES_HOST: indirizzo del server postgresql
 - POSTGRES_DB: database backup
 
-###env redis 
+### env redis 
 - REDIS_PASSWORD: password del database redis
 - REDIS_HOST: indirizzo del server redis
 - REDIS_PORT: porta del server redis
