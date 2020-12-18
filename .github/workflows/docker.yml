@@ -146,9 +146,12 @@ jobs:
           path: ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
 
   push-manifest:
-    name: Create and push multi-arch Docker manifest
+    name: Create and push multi-arch Docker manifest (${{matrix.database}})
     runs-on: ubuntu-20.04
-    if: ${{ github.event_name != 'pull_request' && false }}
+    strategy:
+      matrix:
+        database: [ folder, influxdb, redis, mariadb, postgresql ]
+    if: ${{ github.event_name != 'pull_request'}}
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
     needs: build
@@ -160,12 +163,14 @@ jobs:
       - name: Load environment info and built images
         run: |
           cat github_env/github.env > $GITHUB_ENV
-          docker load --input image_linux386/linux386.tar
-          docker load --input image_linuxamd64/linuxamd64.tar
-          docker load --input image_linuxarmv6/linuxarmv6.tar
-          docker load --input image_linuxarmv7/linuxarmv7.tar
-          docker load --input image_linuxarm64/linuxarm64.tar
-          docker load --input image_linuxppc64le/linuxppc64le.tar
+          if [ "${{ matrix.database }}" != influxdb]; then
+            docker load --input image_${{ matrix.database }}_linux386/linux386.tar
+            docker load --input image_${{ matrix.database }}_linuxarmv6/linuxarmv6.tar
+          fi
+          docker load --input image_${{ matrix.database }}_linuxamd64/linuxamd64.tar
+          docker load --input image_${{ matrix.database }}_linuxarmv7/linuxarmv7.tar
+          docker load --input image_${{ matrix.database }}_linuxarm64/linuxarm64.tar
+          docker load --input image_${{ matrix.database }}_linuxppc64le/linuxppc64le.tar
       - name: Login to ghcr registry
         uses: docker/login-action@v1
         with:
@@ -180,6 +185,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_ACCESS_TOKEN }}
 
       - name: Create and push manifest
+        if: ${{ false }}
 
         run: |
           # -- Push to ghcr.io
