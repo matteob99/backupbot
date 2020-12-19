@@ -6,7 +6,7 @@ on:
 
 
 jobs:
-  tests:
+  test:
     name: test pep8
     runs-on: ubuntu-20.04
     steps:
@@ -29,6 +29,7 @@ jobs:
     env:
       IMAGE_TAG: ghcr.io/${{ github.repository_owner }}/backupbot
       IMAGE_TAG_DH: ${{ secrets.DOCKERHUB_OWNER }}/backupbot
+    needs: test
     strategy:
       matrix:
         arch: [linux/386, linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/ppc64le]
