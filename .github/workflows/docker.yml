@@ -1,4 +1,4 @@
-name: Docker multi-arch build and push
+name: Docker test, build and push
 
 on:
   push:

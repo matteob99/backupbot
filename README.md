@@ -1,4 +1,4 @@
-# backupbot
+# backupbot ![Docker test, build and push](https://github.com/matteob99/backupbot/workflows/Docker%20multi-arch%20build%20and%20push/badge.svg)
 
 ita 🇮🇹
 
