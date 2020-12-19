@@ -10,35 +10,39 @@ import json
 from requests import get
 
 
-def dumpredis(redisdball=None, path=None):
+def dumpredis(redisdb):
+    r = redis.StrictRedis(host=redisdb["host"], port=redisdb["port"],
+                          db=redisdb["db"], password=redisdb["password"])
+    a = {"name": redisdb["name"]}
+    b = {}
+    for key in r.keys("*"):
+        try:
+            c = r.hgetall(key.decode("utf-8"))
+            d = {}
+            for e in c:
+                try:
+                    d[e.decode('utf-8')] = int(c[e])
+                except Exception:
+                    if c[e] == b"True":
+                        d[e.decode('utf-8')] = True
+                    elif c[e] == b"False":
+                        d[e.decode('utf-8')] = False
+                    else:
+                        d[e.decode('utf-8')] = c[e].decode('utf-8')
+            b.update({key.decode("utf-8"): d})
+        except Exception:
+            pass
+
+    a.update({"value": b})
+    return a
+
+
+def dumpredisall(redisdball=None, path=None):
     if not path:
         path = './redisdump' + str(int(time())) + '.json'
     redisjsonall = []
     for redisdb in redisdball:
-        r = redis.StrictRedis(host=redisdb["host"], port=redisdb["port"],
-                              db=redisdb["db"], password=redisdb["password"])
-        a = {"name": redisdb["name"]}
-        b = {}
-        for key in r.keys("*"):
-            try:
-                c = r.hgetall(key.decode("utf-8"))
-                d = {}
-                for e in c:
-                    try:
-                        d[e.decode('utf-8')] = int(c[e])
-                    except Exception:
-                        if c[e] == b"True":
-                            d[e.decode('utf-8')] = True
-                        elif c[e] == b"False":
-                            d[e.decode('utf-8')] = False
-                        else:
-                            d[e.decode('utf-8')] = c[e].decode('utf-8')
-                b.update({key.decode("utf-8"): d})
-            except Exception:
-                pass
-
-        a.update({"value": b})
-        redisjsonall.append(a)
+        redisjsonall.append(dumpredis(redisdb))
     with open(path, 'w') as jsonfile:
         json.dump(redisjsonall, jsonfile, indent=4, sort_keys=True)
     return path
@@ -104,7 +108,7 @@ def main():
                        name=getenv("NAME"),
                        redisdball=redisdball)
     listdb += "\n#{name}".format(name=getenv("NAME"))
-    path1 = dumpredis(redisdball)
+    path1 = dumpredisall(redisdball)
     path = cryptoandcompresspath(path1)
     os.remove(path1)
 
