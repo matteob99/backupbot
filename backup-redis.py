@@ -1,16 +1,12 @@
 import redis
-import json
 from time import time, sleep
-from botogram.api import TelegramAPI
 from os.path import getmtime
-from botogram import Bot
 import os
 from os import getenv
 from traceback import print_exc
 from subprocess import Popen
 from glob import glob
 import json
-from time import sleep
 from requests import get
 
 
