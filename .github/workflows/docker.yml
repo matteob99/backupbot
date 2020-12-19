@@ -6,6 +6,23 @@ on:
 
 
 jobs:
+  tests:
+    name: test pep8
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@master
+      - name: Setup Python 3.7
+        uses: actions/setup-python@master
+        with:
+          version: 3.7
+      - name: flake8
+        run: |
+          pip install flake8
+          # stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --show-source --statistics
+          # The GitHub editor is 127 chars wide
+          flake8 . --count --max-complexity=10 --max-line-length=127 --statistics
+
   build:
     name: Build Docker image (${{matrix.database}}) (${{ matrix.arch }})
     runs-on: ubuntu-20.04

@@ -11,9 +11,9 @@ services:
       dockerfile: Dockerfile
       context: .
       args:
-        database: mariadb
-    depends_on:
-      - db
+        database: folder
+    volumes:
+      - /home/matteo01/Downloads/Telegram Desktop:/data
 
 
   db:

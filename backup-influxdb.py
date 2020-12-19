@@ -1,15 +1,20 @@
 from os import getenv, remove
 from os.path import isfile
 from datetime import datetime as dt
-from botogram.api import TelegramAPI
-from botogram import Bot
 from subprocess import Popen, PIPE
 from os.path import getmtime
 from glob import glob
 from traceback import print_exc
+import json
 from time import sleep
-bot = Bot(TelegramAPI(api_key=getenv("TG_TOKEN_BACKUP"),
-                      endpoint=getenv("TG_ENDPOINT", None)))
+from requests import get
+if getenv("TG_ENDPOINT", None) is None:
+    endpoint = "https://api.telegram.org/"
+else:
+    endpoint = getenv("TG_ENDPOINT")
+endpoint += f"bot{getenv('TG_TOKEN_BACKUP')}/"
+timeout = int(getenv("TG_TIMEOUT", 10))
+chat = getenv("CHAT_BACKUP")
 
 date = dt.now().strftime("%Y_%m_%d_%H_%M")
 file_name = 'backup_{custom}_{date}'.format(custom=getenv("NAME"),
@@ -33,17 +38,42 @@ try:
              f"--password {getenv('BACKUP_PASSWORD')}")
     p = Popen(split, shell=True)
     p.wait()
-    chat = bot.chat(getenv("CHAT_BACKUP"))
+    files = []
+    content = []
     for i, file in enumerate(sorted(glob(f"{file_name}.z*"),
-                                    key=getmtime)):
-        text = "#{custom}\n#d{date}\n{file}\nn:{list}".format(
-            custom=getenv("NAME"),
-            date=date,
-            file=file_name,
-            list=i
-            )
-        chat.send_file(path=file, caption=text)
+                                    key=getmtime), start=1):
+        content.append({"type": "document",
+                        "media": f"attach://document{i}"})
+        files.append((f"document{i}", (file, open(file, "rb"))))
+        if i % 10 == 0:
+            print(content)
+            response = get(f"{endpoint}sendMediaGroup",
+                           params={'chat_id': chat,
+                                   'disable_notification': True,
+                                   'media': json.dumps(content)},
+                           files=files,
+                           timeout=timeout)
+            print(response.status_code, response.text)
+            content = []
+            files = []
         sleep(0.13)
+    if len(files) >= 0:
+        get(f"{endpoint}sendMediaGroup",
+            params={'chat_id': chat,
+                    'media': json.dumps(content)},
+            files=files,
+            timeout=timeout)
+
+    text = "#{custom}\n#d{date}\n{file}".format(
+        custom=getenv("NAME"),
+        date=date,
+        file=f"{date}_{getenv('NAME')}",
+    )
+    get(f"{endpoint}sendMessage",
+        params={'chat_id': chat,
+                'text': text,
+                'parse_mode': 'HTML'})
+
 except Exception:
     print_exc()
 remove(file_name)

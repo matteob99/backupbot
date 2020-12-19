@@ -9,6 +9,9 @@ from os import getenv
 from traceback import print_exc
 from subprocess import Popen
 from glob import glob
+import json
+from time import sleep
+from requests import get
 
 
 def dumpredis(redisdball=None, path=None):
@@ -90,10 +93,13 @@ def cryptoandcompresspath(path, pathdest=None):
 
 def main():
     t = time()
-    bot = Bot(TelegramAPI(api_key=getenv("TG_TOKEN_BACKUP"),
-                          endpoint=getenv("TG_ENDPOINT", None)))
-    text = "#{path}\ntime:{time}s\nlistdb:{listdb}\nn:{list}"
-    chat = bot.chat(getenv("CHAT_BACKUP"))
+    if getenv("TG_ENDPOINT", None) is None:
+        endpoint = "https://api.telegram.org/"
+    else:
+        endpoint = getenv("TG_ENDPOINT")
+    endpoint += f"bot{getenv('TG_TOKEN_BACKUP')}/"
+    timeout = int(getenv("TG_TIMEOUT", 10))
+    chat = getenv("CHAT_BACKUP")
     redisdball = []
     listdb = ""
     redisdball = alldb(host=getenv("REDIS_HOST"),
@@ -105,19 +111,46 @@ def main():
     path1 = dumpredis(redisdball)
     path = cryptoandcompresspath(path1)
     os.remove(path1)
+
     try:
+        files = []
+        content = []
         for i, file in enumerate(sorted(
                 glob(f"{'.'.join(path.split('.')[:-1])}.*"),
                 key=getmtime)):
-            chat.send_file(file, notify=False, caption=text.format(
-                path=path[2:-9],
-                time=time() - t,
-                listdb=listdb,
-                list=i))
+            content.append({"type": "document",
+                            "media": f"attach://document{i}"})
+            files.append((f"document{i}", (file, open(file, "rb"))))
+            if i % 10 == 0:
+                print(content)
+                response = get(f"{endpoint}sendMediaGroup",
+                               params={'chat_id': chat,
+                                       'disable_notification': True,
+                                       'media': json.dumps(content)},
+                               files=files,
+                               timeout=timeout)
+                print(response.status_code, response.text)
+                content = []
+                files = []
             sleep(0.13)
+        if len(files) >= 0:
+            get(f"{endpoint}sendMediaGroup",
+                params={'chat_id': chat,
+                        'media': json.dumps(content)},
+                files=files,
+                timeout=timeout)
+        text = "#{path}\ntime:{time}s\nlistdb:{listdb}".format(
+            path=path[2:-9],
+            time=time() - t,
+            listdb=listdb)
+        get(f"{endpoint}sendMessage",
+            params={'chat_id': chat,
+                    'text': text,
+                    'parse_mode': 'HTML'})
+
+        sleep(0.13)
     except Exception:
         print_exc()
-        chat.send("o cazzo")
     os.remove(path)
     for file in glob(f"{'.'.join(path.split('.')[:-1])}.*"):
         os.remove(file)

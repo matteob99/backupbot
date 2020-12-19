@@ -14,6 +14,7 @@ backup supportati:
 ### env comuni:
 - TG_TOKEN_BACKUP: token del bot
 - TG_ENDPOINT: endpoint delle bot api di default https://api.telegram.org/
+- TG_TIMEOUT: dopo quanto tempo la connessione al server viene chiusa di default 10
 - NAME: nome del backup
 - MAX_SIZE_BACKUP: larghezza massima del file (se si usa un endpoint standard e' 9M)
 - BACKUP_PASSWORD: password del zip di backup
