@@ -141,9 +141,9 @@ jobs:
         if: ${{ github.event_name != 'pull_request'}}
         run: |
           if [ "${{ env.HASH_VERSION }}" != latest ]; then
-              HASH_VERSION = "-${{ env.HASH_VERSION }}"
+              declare -a HASH_VERSION="-${{ env.HASH_VERSION }}"
           else
-              HASH_VERSION = ""
+              declare -a HASH_VERSION=""
           fi
 
           docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG }}:${{ matrix.database}}$HASH_VERSION-${{ env.SAFE_ARCH }}
@@ -158,18 +158,18 @@ jobs:
         if: ${{ github.event_name != 'pull_request'}}
         run: |
           if [ "${{ env.HASH_VERSION }}" != latest ]; then
-              HASH_VERSION = "-${{ env.HASH_VERSION }}"
+              declare -a HASH_VERSION="-${{ env.HASH_VERSION }}"
           else
-              HASH_VERSION = ""
+              declare -a HASH_VERSION=""
           fi
           docker save ${{ env.IMAGE_TAG }}:${{ matrix.database}}$HASH_VERSION-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
       - name: Save image as tar archive (pull request)
         if: ${{ github.event_name == 'pull_request'}}
         run: |
           if [ "${{ env.HASH_VERSION }}" != latest ]; then
-              HASH_VERSION = "-${{ env.HASH_VERSION }}"
+              declare -a HASH_VERSION="-${{ env.HASH_VERSION }}"
           else
-              HASH_VERSION = ""
+              declare -a HASH_VERSION=""
           fi
           docker save backupbot:${{ matrix.database}}$HASH_VERSION-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
       - name: Upload image as artifact
@@ -222,9 +222,9 @@ jobs:
 
         run: |
           if [ "${{ env.HASH_VERSION }}" != latest ]; then
-              HASH_VERSION = "-${{ env.HASH_VERSION }}"
+              declare -a HASH_VERSION="-${{ env.HASH_VERSION }}"
           else
-              HASH_VERSION = ""
+              declare -a HASH_VERSION=""
           fi
           if [ "${{ matrix.database }}" != influxdb ]; then
             declare -a archs=("linux386" "linuxamd64" "linuxarmv6" "linuxarmv7" "linuxarm64" "linuxppc64le")
