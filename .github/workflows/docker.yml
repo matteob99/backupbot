@@ -141,37 +141,27 @@ jobs:
         if: ${{ github.event_name != 'pull_request'}}
         run: |
           if [ "${{ env.HASH_VERSION }}" != latest ]; then
-              declare -a HASH_VERSION="-${{ env.HASH_VERSION }}"
+              declare -a VERSION="-${{ env.VERSION }}"
           else
-              declare -a HASH_VERSION=""
+              declare -a VERSION=""
           fi
 
-          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG }}:${{ matrix.database}}$HASH_VERSION-${{ env.SAFE_ARCH }}
-          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG }}:${{ matrix.database}}-${{ env.VERSION }}-${{ env.SAFE_ARCH }}
-          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}$HASH_VERSION-${{ env.SAFE_ARCH }}
-          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}-${{ env.VERSION }}-${{ env.SAFE_ARCH }}
-          docker push ${{ env.IMAGE_TAG}}:${{ matrix.database}}$HASH_VERSION-${{ env.SAFE_ARCH }}
-          docker push ${{ env.IMAGE_TAG }}:${{ matrix.database}}-${{ env.VERSION }}-${{ env.SAFE_ARCH }}
-          docker push ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}$HASH_VERSION-${{ env.SAFE_ARCH }}
-          docker push ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}-${{ env.VERSION }}-${{ env.SAFE_ARCH }}
+          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG }}:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
+          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG }}:${{ matrix.database}}$VERSION-${{ env.SAFE_ARCH }}
+          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
+          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}$VERSION-${{ env.SAFE_ARCH }}
+          docker push ${{ env.IMAGE_TAG}}:${{ matrix.database}}-${{ env.HASH_VERSION}}-${{ env.SAFE_ARCH }}
+          docker push ${{ env.IMAGE_TAG }}:${{ matrix.database}}-$VERSION-${{ env.SAFE_ARCH }}
+          docker push ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
+          docker push ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}-$VERSION-${{ env.SAFE_ARCH }}
       - name: Save image as tar archive
         if: ${{ github.event_name != 'pull_request'}}
         run: |
-          if [ "${{ env.HASH_VERSION }}" != latest ]; then
-              declare -a HASH_VERSION="-${{ env.HASH_VERSION }}"
-          else
-              declare -a HASH_VERSION=""
-          fi
-          docker save ${{ env.IMAGE_TAG }}:${{ matrix.database}}$HASH_VERSION-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
+          docker save ${{ env.IMAGE_TAG }}:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
       - name: Save image as tar archive (pull request)
         if: ${{ github.event_name == 'pull_request'}}
         run: |
-          if [ "${{ env.HASH_VERSION }}" != latest ]; then
-              declare -a HASH_VERSION="-${{ env.HASH_VERSION }}"
-          else
-              declare -a HASH_VERSION=""
-          fi
-          docker save backupbot:${{ matrix.database}}$HASH_VERSION-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
+          docker save backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
       - name: Upload image as artifact
         uses: actions/upload-artifact@v2
 
@@ -222,9 +212,9 @@ jobs:
 
         run: |
           if [ "${{ env.HASH_VERSION }}" != latest ]; then
-              declare -a HASH_VERSION="-${{ env.HASH_VERSION }}"
+              declare -a VERSION="-${{ env.VERSION }}"
           else
-              declare -a HASH_VERSION=""
+              declare -a VERSION=""
           fi
           if [ "${{ matrix.database }}" != influxdb ]; then
             declare -a archs=("linux386" "linuxamd64" "linuxarmv6" "linuxarmv7" "linuxarm64" "linuxppc64le")
@@ -235,23 +225,23 @@ jobs:
           declare -a  docker_hubs=("${{ env.IMAGE_TAG }}", "${{ env.IMAGE_TAG_DH}}")
           for docker_hub in "${docker_hubs[@]}"; do
             for arch in "${archs[@]}"; do
-              docker tag "${{ env.IMAGE_TAG }}:${{ matrix.database }}$HASH_VERSION-$arch" "$docker_hub:${{ matrix.database }}-${{ env.VERSION }}-$arch"
+              docker tag "${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch" "$docker_hub:${{ matrix.database }}-$VERSION-$arch"
             done
             manifest=""
             for arch in "${archs[@]}"; do
-               manifest="$manifest --amend $docker_hub:${{ matrix.database }}$HASH_VERSION-$arch"
+               manifest="$manifest --amend $docker_hub:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch"
             done
-            docker manifest create $docker_hub:${{ matrix.database }}$HASH_VERSION $manifest
-            docker manifest push $docker_hub:${{ matrix.database }}$HASH_VERSION
+            docker manifest create $docker_hub:${{ matrix.database }}-${{ env.HASH_VERSION }} $manifest
+            docker manifest push $docker_hub:${{ matrix.database }}-${{ env.HASH_VERSION }}
 
             # Tag images as VERSION (like 'latest')
             for arch in "${archs[@]}"; do
-              docker tag "${{ env.IMAGE_TAG }}:${{ matrix.database }}$HASH_VERSION-$arch" "$docker_hub:${{ matrix.database }}-${{ env.VERSION }}-$arch"
+              docker tag "${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch" "$docker_hub:${{ matrix.database }}-$VERSION-$arch"
             done
             manifest=""
             for arch in "${archs[@]}"; do
-               manifest="$manifest --amend ${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.VERSION }}-$arch"
+               manifest="$manifest --amend ${{ env.IMAGE_TAG }}:${{ matrix.database }}-$$VERSION-$arch"
             done
-            docker manifest create $docker_hub:${{ matrix.database }}-${{ env.VERSION }} $manifest
-            docker manifest push $docker_hub:${{ matrix.database }}-${{ env.VERSION }}
+            docker manifest create $docker_hub:${{ matrix.database }}-$VERSION $manifest
+            docker manifest push $docker_hub:${{ matrix.database }}-$VERSION
           done
