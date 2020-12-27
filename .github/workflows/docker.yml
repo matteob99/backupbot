@@ -33,7 +33,7 @@ jobs:
     strategy:
       matrix:
         arch: [linux/386, linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/ppc64le]
-        database: [folder, influxdb, redis, mariadb, postgresql]
+        database: [folder, influxdb, redis, mariadb, postgresql, default]
         exclude:
           - arch: linux/386
             database: influxdb
@@ -68,6 +68,14 @@ jobs:
           VERSION=$(echo "$VERSION" | awk '{print tolower($0)}')
           ARCH=${{ matrix.arch }}
           SAFE_ARCH=${ARCH///}  # linux/amd64 -> linuxamd64
+          if [ "${{ matrix.database }}" != default ]; then
+              declare -a DATABASE="${{ matrix.database }}-"
+              declare -a BUILD_ARG="${{ matrix.database }}"
+          else
+              declare -a DATABASE=""
+              declare -a BUILD_ARG="postgresql"
+          fi
+
 
           # Store variable for future use
           echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
@@ -75,6 +83,8 @@ jobs:
           echo "HASH_VERSION=$HASH_VERSION" >> $GITHUB_ENV
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "SAFE_ARCH=$SAFE_ARCH" >> $GITHUB_ENV
+          echo "DATABASE=$DATABASE" >> $GITHUB_ENV
+          echo "BUILD_ARG=$BUILD_ARG" >> $GITHUB_ENV
 
 
           # Print debug info
@@ -86,7 +96,6 @@ jobs:
 
       - name: Upload environment info as artifact
         uses: actions/upload-artifact@v2
-
         with:
           name: github_env
           path: github.env
@@ -102,7 +111,6 @@ jobs:
 
       - name: Cache Docker layers
         uses: actions/cache@v2
-
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-${{ matrix.database}}-buildx-${{ env.SAFE_ARCH }}-${{ github.sha }}
@@ -135,8 +143,8 @@ jobs:
           push: false
           load: true
           tags: |
-            backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
-          build-args: database=${{ matrix.database}}
+            backupbot:${{ env.DATABASE }}${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
+          build-args: database=${{ env.BUILD_ARG}}
       - name: Tag and push image
         if: ${{ github.event_name != 'pull_request'}}
         run: |
@@ -146,28 +154,28 @@ jobs:
               declare -a VERSION=""
           fi
 
-          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG }}:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
-          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG }}:${{ matrix.database}}$VERSION-${{ env.SAFE_ARCH }}
-          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
-          docker tag backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}$VERSION-${{ env.SAFE_ARCH }}
-          docker push ${{ env.IMAGE_TAG}}:${{ matrix.database}}-${{ env.HASH_VERSION}}-${{ env.SAFE_ARCH }}
+          docker tag backupbot:${{ env.DATABASE }}${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG }}:${{ env.DATABASE }}${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
+          docker tag backupbot:${{ env.DATABASE }}${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG }}:${{ matrix.database}}$VERSION-${{ env.SAFE_ARCH }}
+          docker tag backupbot:${{ env.DATABASE }}${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG_DH }}:${{ env.DATABASE }}${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
+          docker tag backupbot:${{ env.DATABASE }}${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}$VERSION-${{ env.SAFE_ARCH }}
+          docker push ${{ env.IMAGE_TAG}}:${{ env.DATABASE }}${{ env.HASH_VERSION}}-${{ env.SAFE_ARCH }}
           docker push ${{ env.IMAGE_TAG }}:${{ matrix.database}}$VERSION-${{ env.SAFE_ARCH }}
-          docker push ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
+          docker push ${{ env.IMAGE_TAG_DH }}:${{ env.DATABASE }}${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }}
           docker push ${{ env.IMAGE_TAG_DH }}:${{ matrix.database}}$VERSION-${{ env.SAFE_ARCH }}
       - name: Save image as tar archive
         if: ${{ github.event_name != 'pull_request'}}
         run: |
-          docker save ${{ env.IMAGE_TAG }}:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
+          docker save ${{ env.IMAGE_TAG }}:${{ env.DATABASE }}${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} -o ${{ env.DATABASE }}${{ env.SAFE_ARCH }}.tar
       - name: Save image as tar archive (pull request)
         if: ${{ github.event_name == 'pull_request'}}
         run: |
-          docker save backupbot:${{ matrix.database}}-${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} -o ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
+          docker save backupbot:${{ env.DATABASE }}${{ env.HASH_VERSION }}-${{ env.SAFE_ARCH }} -o ${{ env.DATABASE }}${{ env.SAFE_ARCH }}.tar
       - name: Upload image as artifact
         uses: actions/upload-artifact@v2
 
         with:
           name: image_${{ matrix.database}}_${{ env.SAFE_ARCH }}
-          path: ${{ matrix.database}}-${{ env.SAFE_ARCH }}.tar
+          path: ${{ env.DATABASE }}${{ env.SAFE_ARCH }}.tar
 
   push-manifest:
     name: Create and push multi-arch Docker manifest (${{matrix.database}})
@@ -242,7 +250,7 @@ jobs:
             done
             manifest=""
             for arch in "${archs[@]}"; do
-               manifest="$manifest --amend ${{ env.IMAGE_TAG }}:${{ matrix.database }}-$VERSION-$arch"
+               manifest="$manifest --amend ${{ env.IMAGE_TAG }}:${{ matrix.database }}$VERSION-$arch"
             done
             echo "manifest: $manifest"
             docker manifest create $docker_hub:${{ matrix.database }}$VERSION $manifest
