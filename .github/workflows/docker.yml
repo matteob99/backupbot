@@ -221,8 +221,10 @@ jobs:
           else
             declare -a archs=("linuxamd64" "linuxarmv7" "linuxarm64" "linuxppc64le")
           fi
+          echo "archs:$archs"
           # -- Push to ghcr.io
           declare -a  docker_hubs=("${{ env.IMAGE_TAG }}" "${{ env.IMAGE_TAG_DH}}")
+          echo "docker_hubs:$docker_hubs"
           for docker_hub in "${docker_hubs[@]}"; do
             for arch in "${archs[@]}"; do
               docker tag "${{ env.IMAGE_TAG }}:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch" "$docker_hub:${{ matrix.database }}$VERSION-$arch"
@@ -231,6 +233,7 @@ jobs:
             for arch in "${archs[@]}"; do
                manifest="$manifest --amend $docker_hub:${{ matrix.database }}-${{ env.HASH_VERSION }}-$arch"
             done
+            echo "manifest: $manifest"
             docker manifest create $docker_hub:${{ matrix.database }}-${{ env.HASH_VERSION }} $manifest
             docker manifest push $docker_hub:${{ matrix.database }}-${{ env.HASH_VERSION }}
 
@@ -242,6 +245,7 @@ jobs:
             for arch in "${archs[@]}"; do
                manifest="$manifest --amend ${{ env.IMAGE_TAG }}:${{ matrix.database }}-$$VERSION-$arch"
             done
+            echo "manifest: $manifest"
             docker manifest create $docker_hub:${{ matrix.database }}$VERSION $manifest
             docker manifest push $docker_hub:${{ matrix.database }}$VERSION
           done
