@@ -252,8 +252,8 @@ jobs:
             for arch in "${archs[@]}"; do
                manifest="$manifest --amend ${{ env.IMAGE_TAG }}:${{ matrix.database }}$VERSION-$arch"
             done
-            echo "manifest: $manifest"
-            echo -e "docker manifest create $docker_hub:${{ matrix.database }}$VERSION $manifest \n docker manifest push $docker_hub:${{ matrix.database }}$VERSION"
+            echo -e "docker manifest create $docker_hub:${{ matrix.database }}$VERSION $manifest"
             docker manifest create $docker_hub:${{ matrix.database }}$VERSION $manifest
+            echo "docker manifest push $docker_hub:${{ matrix.database }}$VERSION"
             docker manifest push $docker_hub:${{ matrix.database }}$VERSION
           done
