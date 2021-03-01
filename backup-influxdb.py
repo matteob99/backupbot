@@ -38,6 +38,12 @@ try:
              f"--password {getenv('BACKUP_PASSWORD')}")
     p = Popen(split, shell=True)
     p.wait()
+    if isfile(file_name):
+        remove(file_name)
+    elif isdir(file_name):
+        for file in glob(f"{file_name}/*"):
+            remove(file)
+        removedirs(file_name)
     files = []
     content = []
     for i, file in enumerate(sorted(glob(f"{file_name}.z*"),
@@ -78,12 +84,6 @@ try:
 
 except Exception:
     print_exc()
-if isfile(file_name):
-    remove(file_name)
-elif isdir(file_name):
-    for file in glob(f"{file_name}/*"):
-        remove(file)
-    removedirs(file_name)
 for file in glob(f"{file_name}.z*"):
     remove(file)
 with open('/data/last_start', 'w') as file:
