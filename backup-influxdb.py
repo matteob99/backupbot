@@ -1,5 +1,5 @@
-from os import getenv, remove
-from os.path import isfile
+from os import getenv, remove, removedirs
+from os.path import isfile, isdir
 from datetime import datetime as dt
 from subprocess import Popen, PIPE
 from os.path import getmtime
@@ -58,25 +58,32 @@ try:
             files = []
         sleep(0.13)
     if len(files) >= 0:
-        get(f"{endpoint}sendMediaGroup",
-            params={'chat_id': chat,
-                    'media': json.dumps(content)},
-            files=files,
-            timeout=timeout)
+        response = get(f"{endpoint}sendMediaGroup",
+                       params={'chat_id': chat,
+                               'media': json.dumps(content)},
+                       files=files,
+                       timeout=timeout)
+        print(response.status_code, response.text)
 
     text = "#{custom}\n#d{date}\n{file}".format(
         custom=getenv("NAME"),
         date=date,
         file=f"{date}_{getenv('NAME')}",
     )
-    get(f"{endpoint}sendMessage",
-        params={'chat_id': chat,
-                'text': text,
-                'parse_mode': 'HTML'})
+    response = get(f"{endpoint}sendMessage",
+                   params={'chat_id': chat,
+                           'text': text,
+                           'parse_mode': 'HTML'})
+    print(response.status_code, response.text)
 
 except Exception:
     print_exc()
-remove(file_name)
+if isfile(file_name):
+    remove(file_name)
+elif isdir(file_name):
+    for file in glob(f"{file_name}/*"):
+        remove(file)
+    removedirs(file_name)
 for file in glob(f"{file_name}.z*"):
     remove(file)
 with open('/data/last_start', 'w') as file:
