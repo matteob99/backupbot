@@ -186,7 +186,7 @@ jobs:
         database: [ folder, influxdb, redis, mariadb, postgresql ]
         #database: [ folder]
 #    if: ${{ github.event_name != 'pull_request'}}
-    if: ${{False}}
+    if: ${{false}}
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
     needs: build
