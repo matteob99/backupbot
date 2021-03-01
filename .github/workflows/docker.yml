@@ -33,8 +33,8 @@ jobs:
     strategy:
       matrix:
         arch: [linux/386, linux/amd64, linux/arm/v6, linux/arm/v7, linux/arm64, linux/ppc64le]
-       # database: [folder, influxdb, redis, mariadb, postgresql, default]
-        database: [folder]
+        database: [folder, influxdb, redis, mariadb, postgresql, default]
+        #database: [folder]
         exclude:
           - arch: linux/386
             database: influxdb
@@ -183,9 +183,9 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        #database: [ folder, influxdb, redis, mariadb, postgresql ]
-        database: [ folder]
-    if: ${{ github.event_name != 'pull_request'}}
+        database: [ folder, influxdb, redis, mariadb, postgresql ]
+        #database: [ folder]
+    if: ${{ github.event_name != 'pull_request'}} and false
     env:
       DOCKER_CLI_EXPERIMENTAL: enabled
     needs: build
