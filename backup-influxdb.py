@@ -51,7 +51,7 @@ try:
         content.append({"type": "document",
                         "media": f"attach://document{i}"})
         files.append((f"document{i}", (file, open(file, "rb"))))
-        if i % 10 == 0:
+        if i % 3 == 0:
             print(content)
             response = get(f"{endpoint}sendMediaGroup",
                            params={'chat_id': chat,
